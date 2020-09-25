@@ -1,7 +1,15 @@
 <?php
-namespace uploader;
+namespace aws;
 
+use Aws\S3\S3Client;
 use Aws\S3\ObjectUploader;
+use Aws\Exception\AwsException;
+
+$s3Client = new S3Client([
+    'version' => 'latest',
+    'region'  => 'us-west-2',
+    'scheme'=> 'http'
+]);
 
 function upload_to_S3() {
   global $_FILES, $s3Client;
@@ -18,25 +26,23 @@ function upload_to_S3() {
     $source
   );
   
-  do {
-    try {
-        $result = $uploader->upload();
-        $result_json = [];
-
-        if ($result["@metadata"]["statusCode"] == '200') {
-          $result_json['message'] = 'File successfully uploaded to ' . $result["ObjectURL"];
-          $result_json['media_key'] = $key;
-        } else {
-          $result_json['message'] = 'Something went wrong while uploading media file.';
-        }
-
-        return json_encode($result_json);
-    } catch (MultipartUploadException $e) {
-        rewind($source);
+  try {
+      $result = $uploader->upload();
+      $result_json = [];
+      
+      if ($result["@metadata"]["statusCode"] == '200') {
+        $result_json['media_key'] = $key;
         
-        $uploader = new MultipartUploader($s3Client, $source, [
-            'state' => $e->getState(),
-        ]);
-    }
-  } while (!isset($result));
+        return json_encode($result_json);
+      } else {
+        
+        return helpers\json_response('500', 'Something went wrong while uploading to S3.');
+      }
+
+  } catch (MultipartUploadException $e) {
+      rewind($source);
+      $uploader = new MultipartUploader($s3Client, $source, [
+          'state' => $e->getState(),
+      ]);
+  }
 }

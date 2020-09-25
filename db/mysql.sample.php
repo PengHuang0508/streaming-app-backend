@@ -1,17 +1,15 @@
 <?php
-require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/user_db.php';
 require_once __DIR__ . '/media_db.php';
-
 
 $con =  connectDB();
 
 function connectDB() {
-  // MySQL credentials
-  // $host = ""; 
-  // $user = ""; 
-  // $password = ""; 
-  // $dbname = ""; 
+  // INSERT HERE
+  $host = ""; 
+  $user = ""; 
+  $password = ""; 
+  $dbname = ""; 
   
    // create connection
    $con = mysqli_connect($host, $user, $password);
@@ -31,7 +29,7 @@ function connectDB() {
       media\createTable($con);
 
       return $con;
-   } else {
-     echo "Error while creating database" . mysqli_error($con);
+   } else {  
+     return \helpers\json_response('500', mysqli_error($con));
    }
 }

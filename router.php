@@ -1,13 +1,16 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/db/mysql.php';
 require_once __DIR__ . '/aws/aws.php';
+require_once __DIR__ . '/helpers.php';
 
 use Pecee\SimpleRouter\SimpleRouter;
 
 /////
-// Testing route
+// Testing routes
 ////
+SimpleRouter::get('/api/', function() {
+  return 'MELLON API READY';
+});
 SimpleRouter::post('/api/', function() {
   return 'MELLON API READY';
 });
@@ -16,95 +19,84 @@ SimpleRouter::post('/api/', function() {
 // Database routes
 /////
 // user routes
-SimpleRouter::get('/api/user/{username}', function($username) {
+SimpleRouter::get('/api/database/user/{username}', function($username) {
   return user\getData($username);
 });
-SimpleRouter::post('/api/user/add', function() {
+SimpleRouter::post('/api/database/user/add', function() {
   $username = $_POST['username'];
 
   return user\createData();
 });
-SimpleRouter::post('/api/user/update/{username}', function($username) {
+SimpleRouter::post('/api/database/user/update/{username}', function($username) {
   $permission = $_POST['permission'];
 
   return user\updatePermission($username, $permission);
 });
 
 // media routes
-SimpleRouter::get('/api/media/', function() {
+SimpleRouter::get('/api/database/media/', function() {
   return media\getData();
 });
-SimpleRouter::post('/api/media/upload', function() {
+SimpleRouter::post('/api/database/media/create', function() {
   global $_FILES;
 
-  // optional fields
-  if (!empty($_POST["media_description"])) {
-    $media_description = $_POST['media_description'];
-  } else {
-    $media_description = 'No description.';
-  }  
-  
-  if (!empty($_POST["uploaded_by"])) {
-    $uploaded_by = $_POST['uploaded_by'];
-  } else {
-    $uploaded_by = 'Anonymous';
-  }
+  if (!empty($_POST["title"]) && !empty($_POST["media_key"]) && !empty($_POST['thumbnail_url'] ) && !empty($_FILES['fileToUpload']['name'])) {
+    $fileData = [];
+    $fileData['media_key'] = $_POST['media_key'];
+    $fileData['title'] = $_POST['title'];
+    $fileData['thumbnail_url'] = $_POST['thumbnail_url'];
+    // optional fields
+    $fileData['media_description'] = helpers\setDefaultValue('media_description', 'No description.');
+    $fileData['uploaded_by'] = helpers\setDefaultValue('uploaded_by', 'Anonymous');
+    $fileData['min_permission'] = helpers\setDefaultValue('min_permission', 'free');
 
-  if (!empty($_POST["min_permission"])) {
-    $min_permission = $_POST['min_permission'];
-  } else {
-    $min_permission = 'free';
-  }
-
-  // required fields
-  if (!empty($_POST["title"]) && !empty($_POST["media_key"])&& !empty($_FILES['fileToUpload']['name'])) {
-    $title = $_POST['title'];
-    $media_key = $_POST['media_key'];
-
-    return media\createData($media_key, $title, $media_description, $uploaded_by, $min_permission);
+    return media\createData($fileData);
   } 
   else {
-    $error['error'] = "Must provide all the required information, including title, media key and file.";
-
-    return json_encode($error);
+    return helpers\json_response('500', "Must provide all the required fields, including title, media_key, thumbnail_url and file.");
   }
 });
-SimpleRouter::post('/api/media/update/{media_key}', function($media_key) {
+
+SimpleRouter::post('/api/database/media/update/view/{media_key}', function($media_key) {
   if (!empty($_POST["created_at"])) {
-    $created_at = $_POST['created_at'];
+    $primary_key['media_key'] = $media_key;
+    $primary_key['created_at'] = $_POST['created_at'];
 
-    return media\updateThumbnail($media_key, $created_at);
-
+    return media\increaseView($primary_key);
   } else {
-    $error['error'] = "Must provide all the required information.";
-
-    return json_encode($error);
+    return helpers\json_response('500', "Cannot find file.");
   }
 });
 
 /////
 // AWS routes
 ////
-SimpleRouter::post('/api/aws/upload', function() {
-  if (!empty($_FILES['fileToUpload']['name'])) {
-
-    return uploader\upload_to_S3();
-  } else {
-    $error['error'] = "Cannot find file.";
-
-    return json_encode($error);
-  }
-
-});
-
-SimpleRouter::post('/api/aws/convertToHLS', function() {
-  $media_key = $_POST['media_key'];
-  
-  return converter\convert_to_HLS($media_key);
+SimpleRouter::get('/api/aws/stream/', function() {
+   return helpers\json_response('500', "Please provide a media key.");
 });
 
 SimpleRouter::get('/api/aws/stream/{media_key}', function($media_key) {
-  return streamer\stream_media($media_key);
+    return aws\stream_media($media_key);
+});
+
+SimpleRouter::post('/api/aws/upload', function() {
+  global $_FILES;
+
+  if (!empty($_FILES['fileToUpload']['name'])) {
+    return aws\upload_to_S3();
+  } else {
+    return helpers\json_response('500', "Cannot find file.");
+  }
+});
+
+SimpleRouter::post('/api/aws/convertToHLS', function() {
+  if (!empty($_POST['media_key'])) {
+    $media_key = $_POST['media_key'];
+
+    return aws\convert_to_HLS($media_key);
+  } else {
+    return helpers\json_response('500', "Cannot find media key.");
+  }
 });
 
 SimpleRouter::start();

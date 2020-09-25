@@ -5,7 +5,7 @@ function createTable($con) {
   $tablename = 'media';
 
   $sql = "CREATE TABLE IF NOT EXISTS media(
-      media_key VARCHAR(64) NOT NULL,
+      media_key VARCHAR(70) NOT NULL,
       thumbnail_url VARCHAR(250) NULL,
       title VARCHAR(50) NOT NULL,
       media_description VARCHAR(120) NULL,
@@ -42,55 +42,52 @@ function getData() {
   return json_encode($result_json);
 }
 
-function createData($media_key, $title, $media_description, $uploaded_by, $min_permission) {
+function createData($fileData) {
   global $_FILES, $con;
 
   $fileToUpload = $_FILES['fileToUpload'];
-  $fileData = \helpers\mediaParser($fileToUpload);
-  $duration = $fileData['duration'];
-  $width = $fileData['width'];
-  $height = $fileData['height']; 
-  $created_at = date("Y/m/d h:i:s", time());
+  $media_info = \helpers\media_parser($fileToUpload);
+  $fileData['duration'] = $media_info['duration'];
+  $fileData['width'] = $media_info['width'];
+  $fileData['height'] = $media_info['height']; 
+  $fileData['created_at'] = date("Y/m/d h:i:s", time());
 
-  $sql = "INSERT INTO media (media_key, title, media_description, uploaded_by, min_permission, duration, width, height, created_at)
-    VALUES ('$media_key', '$title', '$media_description', '$uploaded_by', '$min_permission', '$duration', '$width', '$height', '$created_at');
+  $values = implode("','", $fileData);  
+  $sql = "INSERT INTO media (media_key, title, thumbnail_url, media_description, uploaded_by, min_permission, duration, width, height, created_at)
+    VALUES ('$values');
   ";
-
   if(!mysqli_query($con, $sql)) {
-    return "Error while inserting new data to media table. " . mysqli_error($con);
+    return \helpers\json_response('500', mysqli_error($con));
   }
 }
 
-// function updateThumbnail($media_key, $created_at) {
-//   global $con;
-
-//   $thumbnail_url = 'https://s3-us-west-2.amazonaws.com/thumbnails.mellon.com/elastic-transcoder/hls/' . $media_key . '/00001.png';
-
-//   $sql = "
-//     UPDATE media
-//     SET thumbnail_url = '$thumbnail_url'
-//     WHERE media_key = '$media_key' AND created_at = '$created_at';
-//   ";
-
-//   if(!mysqli_query($con, $sql)) {
-//     return "Error while updating thumbnail_url. " . mysqli_error($con);
-//   };
-// }
-
-// No routes assigned to it yet
-function updateData($media_key, $created_at) {
+function increaseView($primary_key) {
   global $con;
-  
-  $title = $_POST['title'];
-  $min_permission = $_POST['min_permission'];
 
-  $sql = "
-    UPDATE media
-    SET title = '$title', min_permission = '$min_permission'
-    WHERE media_key = '$media_key' AND created_at = '$created_at';
+  $sql = "UPDATE media
+    SET view = view + 1
+    WHERE media_key = '{$primary_key['media_key']}' AND created_at = '{$primary['created_at']}';
   ";
 
   if(!mysqli_query($con, $sql)) {
-    return "Error while updating the media table. " . mysqli_error($con);
+    return \helpers\json_response('500', mysqli_error($con));
   };
 }
+
+// No routes assigned to it yet
+// function updateData($primary_key) {
+//   global $con;
+  
+//   $title = $_POST['title'];
+//   $min_permission = $_POST['min_permission'];
+
+//   $sql = "
+//     UPDATE media
+//     SET title = '$title', min_permission = '$min_permission'
+//     WHERE media_key = ' {$primary_key["media_key"]} ' AND created_at = '{$primary_key['created_at']}';
+//   ";
+
+//   if(!mysqli_query($con, $sql)) {
+//     return "Error while updating the media table. " . mysqli_error($con);
+//   };
+// }

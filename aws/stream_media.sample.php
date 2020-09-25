@@ -1,5 +1,5 @@
 <?php
-namespace streamer;
+namespace aws;
 
 use Aws\CloudFront\CloudFrontClient;
 use Aws\Kms\KmsClient;
@@ -22,7 +22,7 @@ function stream_media($media_key) {
 			}
 	}               
 
-	// example: https://{key}.cloudfront.net/
+	// INSERT HERE
 	$cloudFrontURL = '';
 	$playlistURL = 'elastic-transcoder/hls/' . $media_key . '/hls_' . $media_key . '.m3u8';
 	$resourceKey = $cloudFrontURL.$playlistURL;
@@ -40,9 +40,9 @@ function stream_media($media_key) {
 			]
 	}
 	POLICY;
-	// path	 to key (.pem file)
+	// INSERT HERE (patH to .pem)
 	$privateKey = dirname(__DIR__) . '';
-	// KMS key pair id
+	// INSERT HERE (KMS key pair id)
 	$keyPairId = '';
 	$cloudFrontClient = new CloudFrontClient([
 			'region' => 'us-west-2',

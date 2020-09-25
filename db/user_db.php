@@ -10,7 +10,7 @@ function createTable($con) {
   ";
 
   if(!mysqli_query($con, $sql)) {
-    echo "Error while creating $tablename table" . mysqli_error($con);
+    return \helpers\json_response('500', mysqli_error($con));
   }
 }
 
@@ -39,7 +39,7 @@ function createData($username) {
   $sql = "INSERT INTO user SET username = '$username', permission = '$permission';";
 
   if(!mysqli_query($con, $sql)) {
-    return "Error while inserting new data to user table. " . mysqli_error($con);
+    return \helpers\json_response('500', mysqli_error($con));
   };
 }
 
@@ -52,6 +52,6 @@ function updatePermission($username, $permission) {
   ";
 
   if(!mysqli_query($con, $sql)) {
-    return "Error while updating permission for $username. " . mysqli_error($con);
+    return \helpers\json_response('500', mysqli_error($con));
   };
 }
