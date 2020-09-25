@@ -12,7 +12,9 @@ SimpleRouter::get('/api/', function() {
   return 'MELLON API READY';
 });
 SimpleRouter::post('/api/', function() {
-  return 'MELLON API READY';
+  $result = aws\set_thumbnail_read_permission($_POST['media_key']);
+  echo $result;
+  // return 'MELLON API READY';
 });
 
 /////
@@ -38,8 +40,6 @@ SimpleRouter::get('/api/database/media/', function() {
   return media\getData();
 });
 SimpleRouter::post('/api/database/media/create', function() {
-  global $_FILES;
-
   if (!empty($_POST["title"]) && !empty($_POST["media_key"]) && !empty($_POST['thumbnail_url'] ) && !empty($_FILES['fileToUpload']['name'])) {
     $fileData = [];
     $fileData['media_key'] = $_POST['media_key'];
@@ -80,8 +80,6 @@ SimpleRouter::get('/api/aws/stream/{media_key}', function($media_key) {
 });
 
 SimpleRouter::post('/api/aws/upload', function() {
-  global $_FILES;
-
   if (!empty($_FILES['fileToUpload']['name'])) {
     return aws\upload_to_S3();
   } else {
@@ -90,10 +88,12 @@ SimpleRouter::post('/api/aws/upload', function() {
 });
 
 SimpleRouter::post('/api/aws/convertToHLS', function() {
-  if (!empty($_POST['media_key'])) {
-    $media_key = $_POST['media_key'];
-
-    return aws\convert_to_HLS($media_key);
+  if (!empty($_FILES['fileToUpload']) && !empty($_POST['media_key'])) {
+    $fileData['input_key'] =  $_POST['media_key'];
+    $fileData['is_video'] = helpers\is_video($_FILES['fileToUpload']);
+    $fileData['is_audio'] = helpers\is_audio($_FILES['fileToUpload']);
+    
+    return aws\convert_to_HLS($fileData);
   } else {
     return helpers\json_response('500', "Cannot find media key.");
   }

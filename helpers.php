@@ -8,10 +8,32 @@ function media_parser($fileToUpload) {
   $media_info = [
     'width' => $file['video']['resolution_x'],
     'height' => $file['video']['resolution_y'],
-    'duration' => $file['playtime_string']
+    'duration' => $file['playtime_string'],
   ];
 
   return $media_info;
+}
+
+function is_video($fileToUpload) {  
+  $getID3 = new \getID3;
+  $file = $getID3->analyze($fileToUpload['tmp_name']);
+
+  if(empty($file['video']['dataformat'])) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function is_audio($fileToUpload) {  
+  $getID3 = new \getID3;
+  $file = $getID3->analyze($fileToUpload['tmp_name']);
+
+  if(empty($file['audio']['dataformat'])) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 function setDefaultValue($field_key, $default_value) {

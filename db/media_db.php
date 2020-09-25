@@ -50,6 +50,7 @@ function createData($fileData) {
   $fileData['duration'] = $media_info['duration'];
   $fileData['width'] = $media_info['width'];
   $fileData['height'] = $media_info['height']; 
+  
   $fileData['created_at'] = date("Y/m/d h:i:s", time());
 
   $values = implode("','", $fileData);  
