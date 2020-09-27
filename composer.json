@@ -2,6 +2,7 @@
     "require": {
         "aws/aws-sdk-php": "^3.154",
         "pecee/simple-router": "4.2.0.6",
-        "james-heinrich/getid3": "^1.9"
+        "james-heinrich/getid3": "^1.9",
+        "spatie/async": "^1.5"
     }
 }

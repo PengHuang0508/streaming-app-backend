@@ -1,5 +1,5 @@
 <?php
-namespace helpers;
+namespace utils;
 
 function media_parser($fileToUpload) {  
   $getID3 = new \getID3;
@@ -14,34 +14,34 @@ function media_parser($fileToUpload) {
   return $media_info;
 }
 
-function is_video($fileToUpload) {  
+function add_video_and_audio_data($fileToUpload) {
   $getID3 = new \getID3;
   $file = $getID3->analyze($fileToUpload['tmp_name']);
 
-  if(empty($file['video']['dataformat'])) {
-    return false;
-  } else {
-    return true;
-  }
+  $file_data['is_video'] = !empty($file['video']['dataformat']);
+  $file_data['is_audio'] = !empty($file['audio']['dataformat']);
+
+  return $file_data;
 }
 
-function is_audio($fileToUpload) {  
-  $getID3 = new \getID3;
-  $file = $getID3->analyze($fileToUpload['tmp_name']);
-
-  if(empty($file['audio']['dataformat'])) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-function setDefaultValue($field_key, $default_value) {
-  if (!empty($_POST[$field_key])) {
-    return $_POST[$field_key];
-  } else {
+function set_default_value($field_key, $default_value) {
+  if (empty($_POST[$field_key])) {
     return $default_value;
-  }  
+  }
+ 
+  return $_POST[$field_key];
+}
+
+function parse_and_save_file_data() {
+  if (!empty($_POST["title"]) && !empty($_FILES['fileToUpload'])) {
+    $file_data['title'] = $_POST['title'];
+    // optional fields
+    $file_data['media_description'] = set_default_value('media_description', 'No description.');
+    $file_data['uploaded_by'] = set_default_value('uploaded_by', 'admin');
+    $file_data['min_permission'] = set_default_value('min_permission', 'free');
+  }
+  
+  return $file_data;
 }
 
 function json_response($code = 200, $message = null) {

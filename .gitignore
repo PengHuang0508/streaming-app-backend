@@ -1,14 +1,12 @@
 # vs code config
-/.vscode
+.vscode
 
 # Composer dependencies
 /vendor
 
 # contain sensitive information
-/aws/keys
-/aws/stream_media.php
-/aws/create_HLS_job.php
+/src/Controller/aws/keys
+/src/config.php
 
-/db/mysql.php
-
+/readme.md
 /TODOs.txt
