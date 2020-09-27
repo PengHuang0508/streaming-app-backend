@@ -32,13 +32,11 @@ function create_media($fileData) {
   $fileToUpload = $_FILES['fileToUpload'];
   $mediaInfo = \utils\media_parser($fileToUpload);
   $fileData['duration'] = $mediaInfo['duration'];
-  $fileData['width'] = $mediaInfo['width'];
-  $fileData['height'] = $mediaInfo['height']; 
   $fileData['created_at'] = date("Y/m/d h:i:s", time());
 
   $values = implode("','", $fileData);
   
-  $sql = "INSERT INTO media (title, media_description, uploaded_by, min_permission, media_key, thumbnail_url, duration, width, height, created_at)
+  $sql = "INSERT INTO media (title, media_description, uploaded_by, min_permission, media_key, thumbnail_url, duration, created_at)
     VALUES ('$values');
   ";
 
