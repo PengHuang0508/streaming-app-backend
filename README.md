@@ -24,7 +24,10 @@ post_max_size = 25M
 Setup your _nginx/conf/nginx.conf_ to like this
 
 ```
-server {
+http {
+    ...
+
+    server {
         listen 80 default_server;
         listen [::]:80 default_server ipv6only=on;
         client_max_body_size 25M;
@@ -73,6 +76,7 @@ server {
             include fastcgi_params;
         }
     }
+}
 ```
 
 Next, we will also need [Composer](https://getcomposer.org/) to install PHP dependencies. Go to the repository and install the dependencies with Composer.
