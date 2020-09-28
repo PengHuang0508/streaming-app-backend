@@ -7,6 +7,3 @@
 # contain sensitive information
 /src/Controller/aws/keys
 /src/config.php
-
-/readme.md
-/TODOs.txt

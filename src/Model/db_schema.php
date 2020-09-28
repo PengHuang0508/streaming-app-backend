@@ -1,7 +1,7 @@
 <?php
 $createUserTableQuery = "CREATE TABLE IF NOT EXISTS user(
   username VARCHAR(50) NOT NULL PRIMARY KEY,
-  permission VARCHAR(20),
+  permission VARCHAR(20) DEFAULT 'free',
   email VARCHAR(50) NOT NULL
   );
 ";
