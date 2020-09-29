@@ -21,60 +21,56 @@ upload_max_filesize = 25M
 post_max_size = 25M
 ```
 
-Setup your _nginx/conf/nginx.conf_ to like this
+Setup your _nginx/conf/nginx.conf_ (Windows) or _nginx/sites-available/default_ (Linux) to like this
 
 ```
-http {
-    ...
-
-    server {
-        listen 80 default_server;
-        listen [::]:80 default_server ipv6only=on;
-        client_max_body_size 25M;
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server ipv6only=on;
+    client_max_body_size 25M;
 
 
-        location / {
-            root PATH_TO_FRONTEND_BUILD_FOLDER
-            index index.html index.htm;
+    location / {
+        root PATH_TO_FRONTEND_BUILD_FOLDER
+        index index.html index.htm;
 
-            // Choose the port your frontend will be hosting on
-            proxy_pass https://localhost:3000;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_cache_bypass $http_upgrade;
+        // Choose the port your frontend will be hosting on
+        proxy_pass https://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
 
-            add_header Access-Control-Allow-Origin *;
-        }
-        server_name localhost;
+        add_header Access-Control-Allow-Origin *;
+    }
+    server_name localhost;
 
-        location /api {
-            root PATH_TO_BACKEND_FOLDER
-            index index.php index.html index.htm;
-            try_files $uri  /index.php$is_args$args;
+    location /api {
+        root PATH_TO_BACKEND_FOLDER
+        index index.php index.html index.htm;
+        try_files $uri  /index.php$is_args$args;
 
-            add_header Access-Control-Allow-Origin *;
-        }
+        add_header Access-Control-Allow-Origin *;
+    }
 
-        error_page 404 /404.html;
-        error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-            root /usr/share/nginx/html;
-        }
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
 
-        location ~ \.php$ {
-            try_files $uri =404;
+    location ~ \.php$ {
+        try_files $uri =404;
 
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass    127.0.0.1:9000;
-            fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            include fastcgi_params;
-        }
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass    127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
     }
 }
 ```

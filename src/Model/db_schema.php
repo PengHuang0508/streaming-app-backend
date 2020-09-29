@@ -15,7 +15,7 @@ $createMediaTableQuery = "CREATE TABLE IF NOT EXISTS media(
   min_permission VARCHAR(20) DEFAULT 'free' NOT NULL,
   view INT(5) DEFAULT 0,
   duration TIME NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (uploaded_by) REFERENCES user(username) ON DELETE CASCADE
   );
 ";

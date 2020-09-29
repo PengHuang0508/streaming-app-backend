@@ -82,6 +82,9 @@ SimpleRouter::get('/api/database/media/', function() {
 });
 
 SimpleRouter::post('/api/database/media/update/{mediaKey}', function($mediaKey) {
+  if ($_POST['min_permission'] !== 'free' && $_POST['min_permission'] !== 'premium' ) {  
+    return utils\json_response('500', "Minimum permission can only be 'free' or 'premium'.");
+  }
   $mediaInfo['mediaKey'] = $mediaKey;
   $mediaInfo['title'] = $_POST['title'];
   $mediaInfo['media_description'] = $_POST['media_description'];
