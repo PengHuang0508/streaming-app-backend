@@ -10,7 +10,7 @@ Download and install them on your machine. Please refer to the following guides 
 - [How To Install Linux, Nginx, MySQL, PHP (LEMP stack) in Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04)
 - [How To Install Linux, Nginx, MySQL, PHP (LEMP stack) on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-ubuntu-18-04)
 - [How to Install Nginx, PHP, and MySQL on Windows 10](https://codefaq.org/server/how-to-install-nginx-php-mysql-on-windows-10/)
--
+
 
 ##### Settings
 
